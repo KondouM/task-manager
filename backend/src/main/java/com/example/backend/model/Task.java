@@ -1,6 +1,7 @@
 package com.example.backend.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tasks")
@@ -9,10 +10,10 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String title;
     private String description;
     private boolean completed;
+    private LocalDateTime deadline;
 
     // --- 必須:引数なしのコンストラクタ ---
     public Task() {
@@ -20,7 +21,6 @@ public class Task {
 
     // --- 任意:すべての値を受け取るコンストラクタ ---
     public Task(String title, String description, boolean completed) {
-        this.id = id;
         this.title = title;
         this.description = description;
         this.completed = completed;
@@ -57,5 +57,11 @@ public class Task {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
+    }
+    public LocalDateTime getDeadline() {
+        return deadline;
+    }
+    public void setDeadline(LocalDateTime deadline) {
+       this.deadline = deadline;
     }
 }

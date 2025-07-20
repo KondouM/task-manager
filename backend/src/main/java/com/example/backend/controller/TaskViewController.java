@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 @Controller
@@ -47,11 +48,18 @@ public class TaskViewController {
     // 新しいタスクを追加
     @PostMapping("/tasks/view")
     public String addTask(@RequestParam String title,
-                          @RequestParam String description){
+                          @RequestParam String description,
+                          @RequestParam String deadline){
         Task task = new Task();
         task.setTitle(title);
         task.setDescription(description);
         task.setCompleted(false);
+
+        //文字列をLocalDateに変換
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        LocalDateTime parsedDeadline = LocalDateTime.parse(deadline, formatter);
+        task.setDeadline(parsedDeadline);
+        
         taskRepository.save(task);
         return "redirect:/tasks/view";
     }
