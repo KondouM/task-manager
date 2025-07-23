@@ -19,6 +19,11 @@ public class Task {
     public Task() {
     }
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+
     // --- 任意:すべての値を受け取るコンストラクタ ---
     public Task(String title, String description, boolean completed) {
         this.title = title;
@@ -58,10 +63,19 @@ public class Task {
     public void setCompleted(boolean completed) {
         this.completed = completed;
     }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+
     public LocalDateTime getDeadline() {
         return deadline;
     }
     public void setDeadline(LocalDateTime deadline) {
        this.deadline = deadline;
+
     }
 }

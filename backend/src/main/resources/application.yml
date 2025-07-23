@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/taskdb
+    url: jdbc:postgresql://localhost:5432/taskdb?characterEncoding=UTF-8&useUnicode=true
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
@@ -13,3 +13,12 @@ spring:
         '[format_sql]': true
   profiles:
     active: local
+  thymeleaf:
+    encoding: UTF-8
+    mode: HTML
+    cache: false
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
