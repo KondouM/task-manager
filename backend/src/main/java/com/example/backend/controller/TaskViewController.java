@@ -3,14 +3,17 @@ package com.example.backend.controller;
 import com.example.backend.model.Task;
 import com.example.backend.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import com.example.backend.repository.UserRepository;
+import com.example.backend.model.User;
 import java.util.List;
-
+import java.security.Principal;
 
 
 @Controller
@@ -18,6 +21,9 @@ public class TaskViewController {
 
     @Autowired
     private TaskRepository taskRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     // ルートパスをタスク一覧ページにリダイレクト
     @GetMapping("/")
@@ -25,33 +31,45 @@ public class TaskViewController {
         return "redirect:/tasks/view";
     }
 
-    // タスク一覧ページを表示（アクティブタスクと完了タスクを分離）
     @GetMapping("/tasks/view")
-    public String showTasks(Model model){
-        // データベースから全タスクを取得
-        List<Task> allTasks = taskRepository.findAll();
-        // アクティブ（未完了）タスクをフィルタリング
+    public String showTasks(Model model, Authentication authentication) {
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username); // ユーザー取得
+    
+        // ログインユーザーのタスクだけ取得
+        List<Task> allTasks = taskRepository.findByUser(user);
+    
         List<Task> activeTasks = allTasks.stream()
-                                            .filter(task -> !task.isCompleted())
-                                            .toList();
-        // 完了タスクをフィルタリング
+                                         .filter(task -> !task.isCompleted())
+                                         .toList();
         List<Task> completedTasks = allTasks.stream()
                                             .filter(Task::isCompleted)
                                             .toList();
-        // Thymeleafテンプレート用にモデルにタスクを追加
+    
         model.addAttribute("tasks", activeTasks);
         model.addAttribute("completedTasks", completedTasks);
+    
+        // 管理者権限チェック
+        boolean isAdmin = authentication.getAuthorities()
+                          .contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        model.addAttribute("isAdmin", isAdmin);
+    
         return "tasks";
     }
 
     // 新しいタスクを追加
     @PostMapping("/tasks/view")
     public String addTask(@RequestParam String title,
-                          @RequestParam String description){
+                          @RequestParam String description,
+                          Principal principal){
+        String username = principal.getName();
+        User user = userRepository.findByUsername(username);
+        
         Task task = new Task();
         task.setTitle(title);
         task.setDescription(description);
         task.setCompleted(false);
+        task.setUser(user);
         taskRepository.save(task);
         return "redirect:/tasks/view";
     }
