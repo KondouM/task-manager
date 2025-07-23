@@ -23,6 +23,8 @@
                      th:checked="${task.completed} ? 'checked'" onchange="this.form.submit()" />
               <span th:text="${task.title}" class="ms-2"></span>：
               <span th:text="${task.description}"></span>
+              <!-- 🕓 期限 -->
+              <span class="text-muted ms-2" th:text="${#temporals.format(task.deadline, 'yyyy/MM/dd HH:mm')}"></span>
             </form>
           </div>
           <form th:action="@{/tasks/delete}" method="post" class="d-inline">
@@ -43,6 +45,8 @@
                    th:checked="${task.completed} ? 'checked'" onchange="this.form.submit()" />
             <s><span th:text="${task.title}" class="ms-2"></span>：</s>
             <s><span th:text="${task.description}"></span></s>
+            <!-- 🕓 期限 -->
+            <s><span class="text-muted ms-2" th:text="${#temporals.format(task.deadline, 'yyyy/MM/dd HH:mm')}"></span></s>
           </form>
           <form th:action="@{/tasks/delete}" method="post" class="d-inline float-end">
             <input type="hidden" name="id" th:value="${task.id}" />
@@ -59,10 +63,14 @@
         <div class="mb-3">
           <input type="text" name="title" class="form-control" placeholder="タイトル" required>
         </div>
-        <div class="mb-3">
-          <input type="text" name="description" class="form-control" placeholder="説明">
-        </div>
-        <button type="submit" class="btn btn-primary w-100">追加</button>
+                 <div class="mb-3">
+           <input type="text" name="description" class="form-control" placeholder="説明">
+         </div>
+         <div class="mb-3">
+           <label class="form-label">期限</label>
+           <input type="datetime-local" name="deadline" class="form-control" />
+         </div>
+         <button type="submit" class="btn btn-primary w-100">追加</button>
       </form>
       
       <!-- 管理者だけに表示 -->

@@ -14,6 +14,9 @@ import com.example.backend.repository.UserRepository;
 import com.example.backend.model.User;
 import java.util.List;
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 
 
 @Controller
@@ -61,15 +64,25 @@ public class TaskViewController {
     @PostMapping("/tasks/view")
     public String addTask(@RequestParam String title,
                           @RequestParam String description,
+
                           Principal principal){
         String username = principal.getName();
         User user = userRepository.findByUsername(username);
         
+
+                          @RequestParam String deadline){
+
         Task task = new Task();
         task.setTitle(title);
         task.setDescription(description);
         task.setCompleted(false);
         task.setUser(user);
+
+
+        //文字列をLocalDateに変換
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        LocalDateTime parsedDeadline = LocalDateTime.parse(deadline, formatter);
+        task.setDeadline(parsedDeadline);
         taskRepository.save(task);
         return "redirect:/tasks/view";
     }
